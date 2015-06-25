@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script>
+        var xmlhttp;
+		setInterval(function(){fetchLog()},1000);
+
+        function loadXMLDoc(url, cfunc) {
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange = cfunc;
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        }
+
+        function fetchLog() {
+            loadXMLDoc("/log_data", function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					var log_data = xmlhttp.responseText
+					if(log_data != "")
+                    	document.getElementById("logDiv").innerHTML += xmlhttp.responseText + "<br>";
+				}
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+    <div id="logDiv"> <h3> Server Log </br> </h3> </div>
+
+</body>
+
+</html>
