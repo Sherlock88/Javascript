@@ -17,14 +17,12 @@ var fs = require('fs')
 var http = require('http')
 var url = require('url')
 
-
 var log_file = "./log_file.txt"
-var log_file_ajax = "./log_watcher_client.html"
+var log_watcher_polling_client = "./log_watcher_polling_client.html"
 var existing_file_data = fs.readFileSync(log_file)
 var existing_data_length = existing_file_data.length
-var client_end = fs.readFileSync(log_file_ajax)
+var log_watcher_polling_client_html = fs.readFileSync(log_watcher_polling_client)
 var pending_data = String(existing_file_data).replace(/\n/g, "<br/>")
-
 
 var server = http.createServer(function (request, response) {
 	var parsedURL = url.parse(request.url, true)
@@ -32,7 +30,7 @@ var server = http.createServer(function (request, response) {
 	var date = new Date()
 	console.log("API [" + date.toISOString() + "]: " + api_end)
 	if(api_end === "/log")
-		response.end(client_end) 
+		response.end(log_watcher_polling_client_html) 
 	else
 		if(api_end === "/log_data") {
 			response.end(pending_data)
@@ -47,6 +45,7 @@ var server = http.createServer(function (request, response) {
 			response.end("Incorrect endpoint: " + api_end)
 })
 server.listen(8888)
+console.log('Server listening on localhost:8888');
 
 fs.watchFile(log_file, function (curr, prev) {
 	var file_stream = fs.readFileSync(log_file)

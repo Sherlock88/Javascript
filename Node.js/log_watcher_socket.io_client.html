@@ -1,0 +1,20 @@
+<html>
+    <head>
+	<title>Push Notification Server</title>
+    </head>
+    <body>
+	<h3> Server Log </br> </h3> 
+    <div id="container"></div>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script>
+    // creating a new websocket
+    var socket = io.connect('http://localhost:8888');
+    // On every message recived, we print the new data inside the #serverLog div
+    socket.on('notification', function (data) {
+		console.log("Received" + data.length + ' ' + new Date());
+        $('#container').html('Last Update:' + new Date());
+    });
+    </script>
+    </body>
+</html>
