@@ -11,6 +11,8 @@
     var socket = io.connect('http://localhost:8888');
     socket.on('notification', function (data) {
 		data = JSON.parse(data)
+		// Converting to string by adding a null string is absolutely essential, it seems
+		data = data.pending + ""
 		document.getElementById("serverLog").innerHTML += data + "<br>";
     });
     </script>
