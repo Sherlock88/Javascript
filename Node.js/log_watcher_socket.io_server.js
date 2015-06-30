@@ -67,13 +67,15 @@ io.sockets.on('connection', function(socket) {
 		pending_data = modified_file_data.substring(existing_data_length, modified_data_length - 1)
 		
 		/*
-		* Issue: If the client page is refreshed, it establishes multiple WebSocket connections.
-		* Because of having of more than one connections alive simultaneously,
-		* the client receives empty replies for subsequent watchFile() triggers.
-		* As a result, JSON parsing fails at client end.
-		* To reproduce the issue, refresh the client page immediately after server is started.
+		* [Issue]    : If the client page is refreshed, it establishes multiple WebSocket connections.
+		*              Because of having of more than one connections alive simultaneously,
+		*              the client receives empty replies for subsequent watchFile() triggers.
+		*              As a result, JSON parsing fails at client end.
+		* [Reproduce]: Refresh the client page immediately after server is started.
+		* [Solution] : Maintaining unique session ID and keep track of sockets 
+		*              belonging to a particular session ID.
 		*/
-		console.log("Log: [" + pending_data.length + "]: " + pending_data)
+		console.log("[S: " + socket.id + "][L:" + pending_data.length + "]: " + pending_data)
 		json_data = JSON.stringify({ pending: pending_data })
 		socket.emit('notification', json_data);
 	
