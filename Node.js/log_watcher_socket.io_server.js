@@ -18,24 +18,26 @@ var socket_io = require('socket.io')(http);
 var url = require('url')
 var fs = require('fs');
 
+
 var log_file = "./log_file.txt"
 var log_watcher_socket_io_client = "./log_watcher_socket.io_client.html"
 var existing_file_data = fs.readFileSync(log_file)
 var existing_data_length = existing_file_data.length
 var log_watcher_polling_client_html = fs.readFileSync(log_watcher_socket_io_client)
-var pending_data = String(existing_file_data).replace(/\n/g, "<br/>")
+
 
 /*var app = require('http').createServer(handler),
   io = require('socket.io').listen(app),
   fs = require('fs');
 app.listen(8888)*/
 
+
 server = http.createServer(handler)
 io = socket_io.listen(server);
 server.listen(8888);
 console.log('Server listening on localhost:8888');
 
-// on server started we can load our client.html page
+
 function handler(req, res) {
   fs.readFile(log_watcher_socket_io_client, function(err, data) {
     if (err) {
@@ -49,7 +51,7 @@ function handler(req, res) {
 }
 
 
-// Creating a new websocket to keep the content updated without any AJAX request
+// Creating a new WebSocket to keep the content updated without any AJAX request
 io.sockets.on('connection', function(socket) {  
 	fs.watchFile(log_file, function(curr, prev) {
 		var file_stream = fs.readFileSync(log_file)
@@ -58,10 +60,22 @@ io.sockets.on('connection', function(socket) {
 		var modified_file_data = file_stream.toString()
 		var modified_data_length = modified_file_data.length
 
-		// Extract data that has actually changed
-		pending_data = modified_file_data.substring(existing_data_length, modified_data_length + 1)
-		console.log(pending_data)
-		socket.volatile.emit('notification', pending_data.toString);
+		/*
+		* Extract data that has actually changed
+		* Exclude the trailing newline charater as it silently fails the JSON parser
+		*/
+		pending_data = modified_file_data.substring(existing_data_length, modified_data_length - 1)
+		
+		/*
+		* Issue: If the client page is refreshed, it establishes multiple WebSocket connections.
+		* Because of having of more than one connections alive simultaneously,
+		* the client receives empty replies for subsequent watchFile() triggers.
+		* As a result, JSON parsing fails at client end.
+		* To reproduce the issue, refresh the client page immediately after server is started.
+		*/
+		console.log("Log: [" + pending_data.length + "]: " + pending_data)
+		json_data = JSON.stringify({ pending: pending_data })
+		socket.emit('notification', json_data);
 	
 		// Update existing data and its length
 		existing_file_data = modified_file_data

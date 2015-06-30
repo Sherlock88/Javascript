@@ -23,7 +23,7 @@
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
 					var log_data = xmlhttp.responseText
 					if(log_data != "")
-                    	document.getElementById("logDiv").innerHTML += xmlhttp.responseText + "<br>";
+                    	document.getElementById("serverLog").innerHTML += xmlhttp.responseText + "<br>";
 				}
             });
         }
@@ -31,7 +31,7 @@
 </head>
 
 <body>
-    <div id="logDiv"> <h3> Server Log </br> </h3> </div>
+    <div id="serverLog"> <h3> Server Log </br> </h3> </div>
 </body>
 
 </html>

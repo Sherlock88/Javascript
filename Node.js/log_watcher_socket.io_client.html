@@ -4,16 +4,14 @@
     </head>
     <body>
 	<h3> Server Log </br> </h3> 
-    <div id="container"></div>
+    <div id="serverLog"></div>
     <script src="socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script>
-    // creating a new websocket
+    // Creating a new WebSocket
     var socket = io.connect('http://localhost:8888');
-    // On every message recived, we print the new data inside the #serverLog div
     socket.on('notification', function (data) {
-		console.log("Received" + data.length + ' ' + new Date());
-        $('#container').html('Last Update:' + new Date());
+		data = JSON.parse(data)
+		document.getElementById("serverLog").innerHTML += data + "<br>";
     });
     </script>
     </body>
